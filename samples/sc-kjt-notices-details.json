@@ -1,0 +1,100 @@
+[
+  {
+    "source_id": "sc-kjt-notices",
+    "detail_url": "https://kjt.sc.gov.cn/kjt/gstz/2026/9/15/2a0571d5f0a248c8850bee944cd39914.shtml",
+    "title": "四川省科学技术厅关于申报2026年词元券服务机构的通知",
+    "published_at": "2026-09-15T15:36:53+08:00",
+    "info_source": "人工智能处",
+    "issuer": "四川省科学技术厅",
+    "body_selector": ".newsCon",
+    "body_available": true,
+    "attachments": [
+      {
+        "name": "附件：四川省词元券服务机构申报书.docx",
+        "url": "https://kjt.sc.gov.cn/kjt/gstz/2026/9/15/2a0571d5f0a248c8850bee944cd39914/files/附件：四川省词元券服务机构申报书.docx",
+        "form": "独立下载链接"
+      }
+    ],
+    "application_entry": {
+      "type": "login_required_system",
+      "name": "四川省科技管理信息系统",
+      "url": "http://202.61.89.120/",
+      "access_note": "通知明确要求注册、实名认证并登录；本轮不进入系统"
+    },
+    "deadlines": [
+      {
+        "name": "申报单位网上填报截止时间",
+        "value": "2026-09-22T18:00:00+08:00"
+      },
+      {
+        "name": "推荐单位网上推荐和推荐函截止时间",
+        "value": "2026-09-23T18:00:00+08:00"
+      }
+    ],
+    "http_status": 200,
+    "response_size_bytes": 68915,
+    "collected_at": "2026-09-16T14:16:38+08:00"
+  },
+  {
+    "source_id": "sc-kjt-notices",
+    "detail_url": "https://kjt.sc.gov.cn/kjt/gstz/2026/9/14/e4b7c4b11d8a4725a4b83ad6543462ce.shtml",
+    "title": "四川省科学技术厅关于开展四川省创新联合体申报工作的通知",
+    "published_at": "2026-09-14T17:19:15+08:00",
+    "info_source": "产业处",
+    "issuer": "四川省科学技术厅",
+    "body_selector": ".newsCon",
+    "body_available": true,
+    "attachments": [
+      {
+        "name": "附件1-5.docx",
+        "url": "https://kjt.sc.gov.cn/kjt/gstz/2026/9/14/e4b7c4b11d8a4725a4b83ad6543462ce/files/附件1-5.docx",
+        "form": "一个文件包含5项附件"
+      }
+    ],
+    "application_entry": {
+      "type": "offline_submission",
+      "name": "向四川省科学技术厅报送纸质版和电子版材料",
+      "url": null
+    },
+    "deadlines": [
+      {
+        "name": "申报材料报送截止时间",
+        "value": "2026-09-28"
+      }
+    ],
+    "http_status": 200,
+    "response_size_bytes": 67673,
+    "collected_at": "2026-09-16T14:17:57+08:00"
+  },
+  {
+    "source_id": "sc-kjt-notices",
+    "detail_url": "https://kjt.sc.gov.cn/kjt/gstz/2026/9/8/fad8adccd6344da2a254358203e97c63.shtml",
+    "title": "四川省科学技术厅关于组织开展2026年度四川省中小企业发展专项项目申报工作的通知",
+    "published_at": "2026-09-08T18:23:53+08:00",
+    "info_source": null,
+    "info_source_evidence": "详情页发布机构字段为空",
+    "issuer": "四川省科学技术厅",
+    "body_selector": ".newsCon",
+    "body_available": true,
+    "attachments": [],
+    "application_entry": {
+      "type": "login_required_system",
+      "name": "四川省科技管理信息系统",
+      "url": "http://202.61.89.120/",
+      "access_note": "通知明确要求注册、实名认证并登录；本轮不进入系统"
+    },
+    "deadlines": [
+      {
+        "name": "网上申报截止时间",
+        "value": "2026-09-27T18:00:00+08:00"
+      },
+      {
+        "name": "推荐材料截止时间",
+        "value": "2026-09-29T18:00:00+08:00"
+      }
+    ],
+    "http_status": 200,
+    "response_size_bytes": 83527,
+    "collected_at": "2026-09-16T14:18:57+08:00"
+  }
+]

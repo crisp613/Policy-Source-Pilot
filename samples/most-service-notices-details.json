@@ -1,0 +1,145 @@
+[
+  {
+    "source_id": "most-service-notices",
+    "detail_url": "https://service.most.gov.cn/kjjh_tztg_all/20260828/5864.html",
+    "program_name": "战略性科技创新合作",
+    "program_name_evidence": "通知标题和正文明确给出重点专项名称",
+    "title": "科技部国际合作司关于发布国家重点研发计划“战略性科技创新合作”重点专项2026年度联合研发与示范项目申报指南的通知",
+    "published_at": "2026-08-28T00:00:00+08:00",
+    "publishing_unit": "科学技术部",
+    "issuer": "科技部国际合作司",
+    "signature_date": "2026-08-25",
+    "body_selector": ".article-body.section1",
+    "body_available": true,
+    "attachments": [
+      {
+        "name": "内地与香港、内地与澳门协商确定的港澳单位名单",
+        "url": null,
+        "form": "名称公开，登录后查看"
+      },
+      {
+        "name": "“战略性科技创新合作”重点专项2026年度联合研发与示范项目申报指南",
+        "url": null,
+        "form": "名称公开，登录后查看"
+      },
+      {
+        "name": "形式审查条件要求",
+        "url": null,
+        "form": "名称公开，登录后查看"
+      }
+    ],
+    "application_entry": {
+      "type": "login_required_system",
+      "name": "国家科技管理信息系统",
+      "url": "http://service.most.gov.cn",
+      "access_note": "通知要求通过系统填报；指南材料需登录后查看，本轮不采集"
+    },
+    "deadlines": [
+      {
+        "name": "项目申报单位网上填报受理时间",
+        "start": "2026-09-03T08:00:00+08:00",
+        "end": "2026-10-08T16:00:00+08:00"
+      },
+      {
+        "name": "推荐单位确认截止时间",
+        "end": "2026-10-15T16:00:00+08:00"
+      }
+    ],
+    "http_status": 200,
+    "response_size_bytes": 13005,
+    "collected_at_evidence": "取自本地响应文件修改时间",
+    "collected_at": "2026-09-16T14:37:17+08:00"
+  },
+  {
+    "source_id": "most-service-notices",
+    "detail_url": "https://service.most.gov.cn/kjjh_tztg_all/20260819/5863.html",
+    "program_name": "移动信息网络国家科技重大专项",
+    "program_name_evidence": "通知标题和正文明确给出专项名称",
+    "title": "关于发布移动信息网络国家科技重大专项2027年度项目申报指南（公开竞争）的通知",
+    "published_at": "2026-08-19T00:00:00+08:00",
+    "publishing_unit": "移动信息网络国家科技重大专项实施管理办公室",
+    "issuer": "移动信息网络国家科技重大专项实施管理办公室",
+    "signature_date": "2026-08-18",
+    "body_selector": ".article-body.section1",
+    "body_available": true,
+    "attachments": [
+      {
+        "name": "移动信息网络国家科技重大专项2027年度项目申报指南（公开竞争）",
+        "url": null,
+        "form": "名称公开，登录后查看"
+      }
+    ],
+    "application_entry": {
+      "type": "login_required_system",
+      "name": "国家科技管理信息系统",
+      "url": "http://service.most.gov.cn",
+      "access_note": "通知要求通过系统申报；指南材料需登录后查看，本轮不采集"
+    },
+    "deadlines": [
+      {
+        "name": "申报材料受理时间",
+        "start": "2026-08-19T08:00:00+08:00",
+        "end": "2026-10-08T16:00:00+08:00"
+      },
+      {
+        "name": "国科管系统填报开始时间",
+        "start": "2026-09-09T08:00:00+08:00"
+      },
+      {
+        "name": "推荐单位确认时间",
+        "start": "2026-10-09T08:00:00+08:00",
+        "end": "2026-10-11T16:00:00+08:00"
+      }
+    ],
+    "http_status": 200,
+    "response_size_bytes": 11999,
+    "collected_at_evidence": "取自本地响应文件修改时间",
+    "collected_at": "2026-09-16T14:38:12+08:00"
+  },
+  {
+    "source_id": "most-service-notices",
+    "detail_url": "https://service.most.gov.cn/kjjh_tztg_all/20260807/5860.html",
+    "program_name": "城镇可持续发展关键技术与装备",
+    "program_name_evidence": "通知标题和正文明确给出重点专项名称",
+    "title": "住房城乡建设部办公厅关于组织国家重点研发计划“城镇可持续发展关键技术与装备”重点专项2026年度项目申报工作的通知",
+    "published_at": "2026-08-07T00:00:00+08:00",
+    "publishing_unit": "住房城乡建设部",
+    "issuer": "住房城乡建设部办公厅",
+    "signature_date": "2026-07-29",
+    "body_selector": ".article-body.section1",
+    "body_available": true,
+    "attachments": [
+      {
+        "name": "“城镇可持续发展关键技术与装备”重点专项2026年度项目申报指南",
+        "url": null,
+        "form": "名称公开，登录后查看"
+      },
+      {
+        "name": "可申报本专项的港澳科研单位名单",
+        "url": null,
+        "form": "名称公开，登录后查看"
+      }
+    ],
+    "application_entry": {
+      "type": "login_required_system",
+      "name": "国家科技管理信息系统",
+      "url": "https://service.most.gov.cn",
+      "access_note": "通知要求通过系统申报；指南材料需登录后查看，本轮不采集"
+    },
+    "deadlines": [
+      {
+        "name": "网上填报申报书受理时间",
+        "start": "2026-08-07T08:00:00+08:00",
+        "end": "2026-09-28T16:00:00+08:00"
+      },
+      {
+        "name": "推荐单位确认截止时间",
+        "end": "2026-09-30T16:00:00+08:00"
+      }
+    ],
+    "http_status": 200,
+    "response_size_bytes": 12246,
+    "collected_at_evidence": "取自本地响应文件修改时间",
+    "collected_at": "2026-09-16T14:39:01+08:00"
+  }
+]

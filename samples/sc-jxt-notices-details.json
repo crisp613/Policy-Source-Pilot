@@ -1,0 +1,102 @@
+[
+  {
+    "source_id": "sc-jxt-notices",
+    "detail_url": "https://jxt.sc.gov.cn/scjxt/wjfb/2026/9/15/c95e71e8c35a4caf8acad93a6a51e68d.shtml",
+    "title": "关于做好“企业找技术”揭榜挂帅项目揭榜申报工作的通知",
+    "published_at": "2026-09-15T00:00:00+08:00",
+    "info_source": "技术创新处",
+    "issuer": "四川省经济和信息化厅办公室",
+    "body_selector": "#zoomcon",
+    "body_available": true,
+    "attachments": [
+      {
+        "name": "附件1：“企业找技术”揭榜挂帅榜单.docx",
+        "url": "https://jxt.sc.gov.cn/scjxt/wjfb/2026/9/15/c95e71e8c35a4caf8acad93a6a51e68d/files/附件1：“企业找技术”揭榜挂帅榜单.docx",
+        "form": "独立下载链接"
+      },
+      {
+        "name": "附件2：“企业找技术”揭榜挂帅项目申报书.doc",
+        "url": "https://jxt.sc.gov.cn/scjxt/wjfb/2026/9/15/c95e71e8c35a4caf8acad93a6a51e68d/files/附件2：“企业找技术”揭榜挂帅项目申报书.doc",
+        "form": "独立下载链接"
+      }
+    ],
+    "application_entry": {
+      "type": "named_section",
+      "name": "四川省技术创新服务体系—企业找技术揭榜挂帅",
+      "url": null
+    },
+    "deadlines": [
+      {
+        "name": "申报截止时间",
+        "value": "2026-10-14T18:00:00+08:00"
+      },
+      {
+        "name": "推荐截止时间",
+        "value": "2026-10-16T18:00:00+08:00"
+      }
+    ],
+    "http_status": 200,
+    "response_size_bytes": 31088,
+    "collected_at": "2026-09-16T13:35:00+08:00"
+  },
+  {
+    "source_id": "sc-jxt-notices",
+    "detail_url": "https://jxt.sc.gov.cn/scjxt/wjfb/2026/9/9/65d7fce92b864ee9a314533bddbaaaad.shtml",
+    "title": "关于组织开展2026年数字化转型典型案例征集工作的通知",
+    "published_at": "2026-09-09T00:00:00+08:00",
+    "signature_date": "2026-09-08",
+    "info_source": "大数据与信息化处",
+    "issuer": "四川省经济和信息化厅办公室",
+    "body_selector": "#zoomcon",
+    "body_available": true,
+    "attachments": [
+      {
+        "name": "数字化转型典型案例推荐案例汇总表",
+        "url": null,
+        "form": "正文内嵌"
+      }
+    ],
+    "application_entry": {
+      "type": "body_text_urls",
+      "urls": [
+        "http://szgx.miit.gov.cn/zzyszh",
+        "https://zgxfmpfz.miit.gov.cn"
+      ]
+    },
+    "deadlines": [
+      {
+        "name": "推荐报送期限",
+        "value": "2026-10-08"
+      }
+    ],
+    "http_status": 200,
+    "response_size_bytes": 74178,
+    "collected_at": "2026-09-16T13:40:41+08:00"
+  },
+  {
+    "source_id": "sc-jxt-notices",
+    "detail_url": "https://jxt.sc.gov.cn/scjxt/wjfb/2026/8/25/c261d493cf3640bdaf55bc8babfe34b8.shtml",
+    "title": "关于印发《四川省重大技术装备首台套软件首版次推广应用指导目录（2026年版）》的通知",
+    "published_at": "2026-08-25T00:00:00+08:00",
+    "metadata_published_at": "2026-08-27T10:00:28+08:00",
+    "signature_date": "2026-08-24",
+    "info_source": "装备产业二处",
+    "issuer": "四川省经济和信息化厅",
+    "document_number": "川经信重装〔2026〕124号",
+    "body_selector": "#zoomcon",
+    "body_available": true,
+    "attachments": [
+      {
+        "name": "附件 四川省重大技术装备首台套软件首版次推广应用指导目录（2026版）.doc",
+        "url": "https://jxt.sc.gov.cn/scjxt/wjfb/2026/8/25/c261d493cf3640bdaf55bc8babfe34b8/files/附件 四川省重大技术装备首台套软件首版次推广应用指导目录（2026版）.doc",
+        "form": "独立下载链接"
+      }
+    ],
+    "application_entry": null,
+    "validity": "自发布之日起执行，有效期三年",
+    "deadlines": [],
+    "http_status": 200,
+    "response_size_bytes": 25148,
+    "collected_at": "2026-09-16T13:42:16+08:00"
+  }
+]
