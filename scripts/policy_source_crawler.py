@@ -13,6 +13,7 @@ from typing import Callable
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+from deadline_extractor import extract_deadlines
 from information_type_classifier import classify_information_type
 
 
@@ -107,6 +108,7 @@ def normalize_detail_record(
     title = parsed.get("title") or list_item.get("title")
     content = parsed.get("body")
     classification = classify_information_type(title, content)
+    deadline_extraction = extract_deadlines(content)
     return {
         "external_id": external_id(config.source_id, detail_url),
         "title": title,
@@ -126,6 +128,10 @@ def normalize_detail_record(
             "information_type": parsed.get("information_type") or classification.information_type,
             "information_type_evidence": parsed.get("information_type_evidence") or classification.evidence,
             "information_type_rule": parsed.get("information_type_rule") or classification.rule,
+            "deadline": parsed.get("deadline") or deadline_extraction.deadline,
+            "deadline_evidence": parsed.get("deadline_evidence") or deadline_extraction.evidence,
+            "deadline_status": parsed.get("deadline_status") or deadline_extraction.status,
+            "deadlines": parsed.get("deadlines") or deadline_extraction.deadlines,
             "signature_date": normalize_datetime(parsed.get("signature_date")),
             "metadata_published_at": normalize_datetime(parsed.get("metadata_published_at")),
             "attachments": parsed.get("attachments") or [],
@@ -174,6 +180,10 @@ def parser_values_from_record(record: dict) -> dict:
         "information_type": metadata.get("information_type"),
         "information_type_evidence": metadata.get("information_type_evidence"),
         "information_type_rule": metadata.get("information_type_rule"),
+        "deadline": metadata.get("deadline"),
+        "deadline_evidence": metadata.get("deadline_evidence"),
+        "deadline_status": metadata.get("deadline_status"),
+        "deadlines": metadata.get("deadlines"),
     }
 
 

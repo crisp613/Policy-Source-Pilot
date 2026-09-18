@@ -62,6 +62,20 @@ class PolicySourceCrawlerSchemaTests(unittest.TestCase):
         self.assertIsNone(record["metadata"]["document_number"])
         self.assertEqual([], record["metadata"]["attachments"])
         self.assertEqual([], record["metadata"]["application_links"])
+        self.assertIsNone(record["metadata"]["deadline"])
+        self.assertEqual("not_provided", record["metadata"]["deadline_status"])
+
+    def test_deadline_fields_are_added_to_unified_metadata(self):
+        record = normalize_detail_record(
+            KJT_CONFIG,
+            detail_url="https://example.test/deadline.html",
+            list_item={"title": "项目申报通知", "published_at": "2026-09-18", "list_page": 1},
+            parsed={"body": "申报截止时间为2026年10月14日18:00。"},
+        )
+
+        self.assertEqual("2026-10-14T18:00:00+08:00", record["metadata"]["deadline"])
+        self.assertEqual("provided", record["metadata"]["deadline_status"])
+        self.assertEqual(1, len(record["metadata"]["deadlines"]))
 
 
 if __name__ == "__main__":

@@ -97,6 +97,10 @@ local-artifacts/<source-id>/first-10-pages/
     "information_type": "申报通知",
     "information_type_evidence": "标题包含“申报”",
     "information_type_rule": "title_application_notice",
+    "deadline": "2026-10-14T18:00:00+08:00",
+    "deadline_evidence": "申报截止时间为2026年10月14日18:00",
+    "deadline_status": "provided",
+    "deadlines": [],
     "attachments": [],
     "application_links": [],
     "collected_at": "采集时间",
@@ -105,7 +109,7 @@ local-artifacts/<source-id>/first-10-pages/
 }
 ```
 
-来源未明确提供的单值字段写为 `null`，列表字段写为空数组，不使用推断值补齐。信息类型只根据标题或正文中的明确关键词划分为申报通知、公示、政策文件、征集或事务通知，同时保存命中证据和规则；无法确认时保持 `null`。`lists.json` 也统一包含来源、标题、详情地址、发布日期及证据、采集时间、页码和发布单位字段。已有旧版 `details.json` 在断点续传时会自动转换为新结构，不需要重新请求网页。
+来源未明确提供的单值字段写为 `null`，列表字段写为空数组，不使用推断值补齐。信息类型只根据标题或正文中的明确关键词划分为申报通知、公示、政策文件、征集或事务通知，同时保存命中证据和规则；无法确认时保持 `null`。截止日期只从截止、申报、受理、报送、推荐或公示期等明确上下文提取；`deadline` 用于列表展示，`deadlines` 保留全部时间节点，`deadline_status` 区分 `provided`、`not_provided` 和 `parse_failed`。`lists.json` 也统一包含来源、标题、详情地址、发布日期及证据、采集时间、页码和发布单位字段。已有旧版 `details.json` 在断点续传时会自动转换为新结构，不需要重新请求网页。
 
 ## 本地测试
 
@@ -115,7 +119,7 @@ local-artifacts/<source-id>/first-10-pages/
 python3 -m unittest discover -s tests -v
 ```
 
-当前结果为 24 项测试全部通过，覆盖统一输出结构、五类信息分类及优先级、列表解析、相对链接、正文清洗、空字段、附件、登录边界、科技厅政策文件模板和未知模板兜底。
+当前结果为 40 项测试全部通过，覆盖统一输出结构、五类信息分类及优先级、截止日期和时间区间、资格日期排除、列表解析、相对链接、正文清洗、空字段、附件、登录边界、科技厅政策文件模板和未知模板兜底。
 
 ## 已知边界
 
