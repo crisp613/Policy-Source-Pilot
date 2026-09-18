@@ -58,8 +58,33 @@ class ScKjtParserTests(unittest.TestCase):
         self.assertEqual([], result["attachments"])
         self.assertEqual([], result["application_links"])
 
+    def test_policy_document_template(self):
+        result = parse_detail(
+            self.fixture("sc-kjt-detail-policy-template.html"),
+            "https://kjt.sc.gov.cn/kjt/xzgfxwj/2026/6/9/a.shtml",
+        )
+
+        self.assertEqual("policy-document", result["parser_template"])
+        self.assertEqual("政策文件模板样本", result["title"])
+        self.assertEqual("2026-06-09", result["published_at"])
+        self.assertEqual("四川省科学技术厅", result["info_source"])
+        self.assertEqual("川科政〔2026〕6号", result["document_number"])
+        self.assertIn("认真贯彻执行", result["body"])
+        self.assertEqual(1, len(result["attachments"]))
+
+    def test_unknown_template_uses_generic_fallback(self):
+        result = parse_detail(
+            self.fixture("sc-kjt-detail-generic-template.html"),
+            "https://kjt.sc.gov.cn/kjt/unknown/2026/6/10/a.shtml",
+        )
+
+        self.assertEqual("generic-fallback", result["parser_template"])
+        self.assertEqual("未知模板通知样本", result["title"])
+        self.assertIn("通用正文提取规则", result["body"])
+        self.assertNotIn("网站地图", result["body"])
+
     def test_missing_required_detail_structure_is_an_error(self):
-        with self.assertRaisesRegex(ValueError, "缺少"):
+        with self.assertRaisesRegex(ValueError, "未找到"):
             parse_detail("<html><body>访问验证页面</body></html>", LIST_URL)
 
 

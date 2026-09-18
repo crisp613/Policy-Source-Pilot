@@ -36,3 +36,60 @@ python3 scripts/sc_jxt_parser.py list \
 ```
 
 解析器只读取本地 HTML，不发起网络请求。
+
+## 四川省经信厅前 10 页正文采集
+
+三个网站现在共用同一个采集引擎，推荐使用统一入口：
+
+```bash
+python3 scripts/crawl_policy_source.py --source sc-jxt
+python3 scripts/crawl_policy_source.py --source sc-kjt
+python3 scripts/crawl_policy_source.py --source most-service
+```
+
+可选来源为 `sc-jxt`、`sc-kjt` 和 `most-service`。默认均采集前 10 页、使用
+`0.2` 秒请求间隔并启用断点续传。原来的三个独立命令继续保留，作为兼容入口。
+
+采集通知列表前 10 页及对应详情页的纯文本正文：
+
+```bash
+python3 scripts/crawl_sc_jxt.py
+```
+
+默认单线程运行，相邻远程请求最小间隔为 `0.2` 秒。结果写入
+`local-artifacts/sc-jxt-notices/first-10-pages/`：
+
+- `lists/`：前 10 页原始列表 HTML；
+- `details-html/`：详情页原始 HTML；
+- `lists.json`：去重后的列表记录；
+- `details.json`：标题、日期、发布主体、纯文本正文、附件链接等解析结果；
+- `summary.json`：成功和失败数量汇总。
+
+脚本默认启用断点续传，已成功保存的页面和详情不会重复请求。当前不下载附件，
+不识别正文图片，也不进行 OCR。
+
+## 四川省科技厅前 10 页正文采集
+
+采集通知列表前 10 页及对应详情页的纯文本正文：
+
+```bash
+python3 scripts/crawl_sc_kjt.py
+```
+
+默认使用 `0.2` 秒请求间隔并启用断点续传，结果写入
+`local-artifacts/sc-kjt-notices/first-10-pages/`。其中 `details.json` 保存详情页
+解析结果，`summary.json` 保存成功和失败数量汇总。当前不下载附件，不识别正文图片，
+也不进行 OCR。
+
+## 国家科技管理信息系统前 10 页正文采集
+
+直接采集公开 iframe 列表前 10 页及对应详情页的纯文本正文：
+
+```bash
+python3 scripts/crawl_most_service.py
+```
+
+默认使用 `0.2` 秒请求间隔并启用断点续传，结果写入
+`local-artifacts/most-service-notices/first-10-pages/`。其中 `details.json` 保存详情页
+解析结果，`summary.json` 保存成功和失败数量汇总。当前不下载附件，不处理图片，
+也不访问登录后的申报指南内容。
