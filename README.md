@@ -90,6 +90,10 @@ local-artifacts/<source-id>/first-10-pages/
     "source_level": "国家或四川省",
     "department_line": "科技或经信",
     "column_name": "公开栏目名称",
+    "publisher": "四川省科学技术厅",
+    "publisher_evidence": "正文落款：四川省科学技术厅",
+    "publisher_source": "issuer",
+    "publisher_status": "provided",
     "issuer": null,
     "publishing_unit": null,
     "info_source": null,
@@ -109,7 +113,7 @@ local-artifacts/<source-id>/first-10-pages/
 }
 ```
 
-来源未明确提供的单值字段写为 `null`，列表字段写为空数组，不使用推断值补齐。信息类型只根据标题或正文中的明确关键词划分为申报通知、公示、政策文件、征集或事务通知，同时保存命中证据和规则；无法确认时保持 `null`。截止日期只从截止、申报、受理、报送、推荐或公示期等明确上下文提取；`deadline` 用于列表展示，`deadlines` 保留全部时间节点，`deadline_status` 区分 `provided`、`not_provided` 和 `parse_failed`。`lists.json` 也统一包含来源、标题、详情地址、发布日期及证据、采集时间、页码和发布单位字段。已有旧版 `details.json` 在断点续传时会自动转换为新结构，不需要重新请求网页。
+来源未明确提供的单值字段写为 `null`，列表字段写为空数组，不使用推断值补齐。发布主体优先采用正文落款，其次采用页面发布单位；只有明确的完整机构名称才能从信息来源提升为发布主体，内部处室仍保留在 `info_source`。信息类型只根据标题或正文中的明确关键词划分为申报通知、公示、政策文件、征集或事务通知，同时保存命中证据和规则；无法确认时保持 `null`。截止日期只从截止、申报、受理、报送、推荐或公示期等明确上下文提取；`deadline` 用于列表展示，`deadlines` 保留全部时间节点，`deadline_status` 区分 `provided`、`not_provided` 和 `parse_failed`。`lists.json` 也统一包含来源、标题、详情地址、发布日期及证据、采集时间、页码和发布单位字段。已有旧版 `details.json` 在断点续传时会自动转换为新结构，不需要重新请求网页。
 
 ## 本地测试
 
@@ -119,7 +123,7 @@ local-artifacts/<source-id>/first-10-pages/
 python3 -m unittest discover -s tests -v
 ```
 
-当前结果为 40 项测试全部通过，覆盖统一输出结构、五类信息分类及优先级、截止日期和时间区间、资格日期排除、列表解析、相对链接、正文清洗、空字段、附件、登录边界、科技厅政策文件模板和未知模板兜底。
+当前结果为 45 项测试全部通过，覆盖统一输出结构、发布主体优先级、内部处室排除、五类信息分类及优先级、截止日期和时间区间、资格日期排除、列表解析、相对链接、正文清洗、空字段、附件、登录边界、科技厅政策文件模板和未知模板兜底。
 
 ## 已知边界
 

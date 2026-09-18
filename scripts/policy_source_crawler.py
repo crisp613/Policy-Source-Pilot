@@ -15,6 +15,7 @@ from urllib.request import Request, urlopen
 
 from deadline_extractor import extract_deadlines
 from information_type_classifier import classify_information_type
+from publisher_normalizer import normalize_publisher
 
 
 ListParser = Callable[[str, str, int | None], list[dict]]
@@ -109,6 +110,15 @@ def normalize_detail_record(
     content = parsed.get("body")
     classification = classify_information_type(title, content)
     deadline_extraction = extract_deadlines(content)
+    publishing_unit = parsed.get("publishing_unit") or list_item.get("publishing_unit")
+    publisher = normalize_publisher(
+        issuer=parsed.get("issuer"),
+        publishing_unit=publishing_unit,
+        info_source=parsed.get("info_source"),
+        publisher=parsed.get("publisher"),
+        publisher_evidence=parsed.get("publisher_evidence"),
+        publisher_source=parsed.get("publisher_source"),
+    )
     return {
         "external_id": external_id(config.source_id, detail_url),
         "title": title,
@@ -121,8 +131,12 @@ def normalize_detail_record(
             "source_level": config.source_level,
             "department_line": config.department_line,
             "column_name": config.column_name,
+            "publisher": publisher.publisher,
+            "publisher_evidence": publisher.evidence,
+            "publisher_source": publisher.source_field,
+            "publisher_status": publisher.status,
             "issuer": parsed.get("issuer"),
-            "publishing_unit": parsed.get("publishing_unit") or list_item.get("publishing_unit"),
+            "publishing_unit": publishing_unit,
             "info_source": parsed.get("info_source"),
             "document_number": parsed.get("document_number"),
             "information_type": parsed.get("information_type") or classification.information_type,
@@ -170,6 +184,9 @@ def parser_values_from_record(record: dict) -> dict:
         "issuer": metadata.get("issuer"),
         "publishing_unit": metadata.get("publishing_unit"),
         "info_source": metadata.get("info_source"),
+        "publisher": metadata.get("publisher"),
+        "publisher_evidence": metadata.get("publisher_evidence"),
+        "publisher_source": metadata.get("publisher_source"),
         "document_number": metadata.get("document_number"),
         "signature_date": metadata.get("signature_date"),
         "metadata_published_at": metadata.get("metadata_published_at"),
