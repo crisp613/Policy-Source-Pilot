@@ -13,6 +13,8 @@ from typing import Callable
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+from information_type_classifier import classify_information_type
+
 
 ListParser = Callable[[str, str, int | None], list[dict]]
 DetailParser = Callable[[str, str], dict]
@@ -102,12 +104,15 @@ def normalize_detail_record(
     """转换为任务书规定的 RawFeedItem 兼容结构。"""
     parsed = parsed or {}
     published_at = parsed.get("published_at") or list_item.get("published_at")
+    title = parsed.get("title") or list_item.get("title")
+    content = parsed.get("body")
+    classification = classify_information_type(title, content)
     return {
         "external_id": external_id(config.source_id, detail_url),
-        "title": parsed.get("title") or list_item.get("title"),
+        "title": title,
         "url": detail_url,
         "published_at": normalize_datetime(published_at),
-        "content": parsed.get("body"),
+        "content": content,
         "metadata": {
             "source_id": config.source_id,
             "source_name": config.name,
@@ -118,6 +123,9 @@ def normalize_detail_record(
             "publishing_unit": parsed.get("publishing_unit") or list_item.get("publishing_unit"),
             "info_source": parsed.get("info_source"),
             "document_number": parsed.get("document_number"),
+            "information_type": parsed.get("information_type") or classification.information_type,
+            "information_type_evidence": parsed.get("information_type_evidence") or classification.evidence,
+            "information_type_rule": parsed.get("information_type_rule") or classification.rule,
             "signature_date": normalize_datetime(parsed.get("signature_date")),
             "metadata_published_at": normalize_datetime(parsed.get("metadata_published_at")),
             "attachments": parsed.get("attachments") or [],
@@ -142,6 +150,31 @@ def record_url(record: dict) -> str | None:
 def record_status(record: dict) -> str | None:
     metadata = record.get("metadata")
     return metadata.get("status") if isinstance(metadata, dict) else record.get("status")
+
+
+def parser_values_from_record(record: dict) -> dict:
+    """将新旧两种已保存记录还原为标准化函数可接受的解析值。"""
+    metadata = record.get("metadata")
+    if not isinstance(metadata, dict):
+        return record
+    return {
+        "title": record.get("title"),
+        "published_at": record.get("published_at"),
+        "body": record.get("content"),
+        "issuer": metadata.get("issuer"),
+        "publishing_unit": metadata.get("publishing_unit"),
+        "info_source": metadata.get("info_source"),
+        "document_number": metadata.get("document_number"),
+        "signature_date": metadata.get("signature_date"),
+        "metadata_published_at": metadata.get("metadata_published_at"),
+        "attachments": metadata.get("attachments"),
+        "application_links": metadata.get("application_links"),
+        "guideline_login_required": metadata.get("guideline_login_required"),
+        "parser_template": metadata.get("parser_template"),
+        "information_type": metadata.get("information_type"),
+        "information_type_evidence": metadata.get("information_type_evidence"),
+        "information_type_rule": metadata.get("information_type_rule"),
+    }
 
 
 def decode_response(payload: bytes, charset: str | None) -> str:
@@ -248,19 +281,18 @@ def crawl_source(
         detail_url = list_item["detail_url"]
         if detail_url in completed:
             previous = completed[detail_url]
-            if set(previous) == {"external_id", "title", "url", "published_at", "content", "metadata"}:
-                details.append(previous)
-            else:
-                details.append(
-                    normalize_detail_record(
-                        config,
-                        detail_url=detail_url,
-                        list_item=list_item,
-                        parsed=previous,
-                        status="ok",
-                        collected_at=previous.get("collected_at"),
-                    )
+            previous_metadata = previous.get("metadata") if isinstance(previous.get("metadata"), dict) else {}
+            details.append(
+                normalize_detail_record(
+                    config,
+                    detail_url=detail_url,
+                    list_item=list_item,
+                    parsed=parser_values_from_record(previous),
+                    status="ok",
+                    collected_at=previous_metadata.get("collected_at") or previous.get("collected_at"),
+                    http_status=previous_metadata.get("http_status") or previous.get("http_status"),
                 )
+            )
             continue
         html_path = output_dir / "details-html" / detail_file_name(detail_url)
         try:

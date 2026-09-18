@@ -22,7 +22,7 @@ class PolicySourceCrawlerSchemaTests(unittest.TestCase):
         records = []
         for config, source_specific in source_values:
             parsed = {
-                "title": "测试通知",
+                "title": "关于召开测试培训会的通知",
                 "published_at": "2026-09-18",
                 "body": "测试正文",
                 "attachments": [],
@@ -33,7 +33,7 @@ class PolicySourceCrawlerSchemaTests(unittest.TestCase):
                 normalize_detail_record(
                     config,
                     detail_url=f"https://example.test/{config.key}/1.html",
-                    list_item={"title": "测试通知", "published_at": "2026-09-18", "list_page": 1},
+                    list_item={"title": "关于召开测试培训会的通知", "published_at": "2026-09-18", "list_page": 1},
                     parsed=parsed,
                     collected_at="2026-09-18T10:00:00+08:00",
                     http_status=200,
@@ -46,6 +46,8 @@ class PolicySourceCrawlerSchemaTests(unittest.TestCase):
             self.assertEqual(expected_top_level, set(record))
             self.assertEqual(expected_metadata, set(record["metadata"]))
             self.assertEqual("2026-09-18T00:00:00+08:00", record["published_at"])
+            self.assertEqual("事务通知", record["metadata"]["information_type"])
+            self.assertEqual("title_administrative_notice", record["metadata"]["information_type_rule"])
 
     def test_missing_source_fields_remain_explicitly_empty(self):
         record = normalize_detail_record(
