@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 from urllib.parse import urljoin
 
-from sc_jxt_parser import Element, clean_text, parse_html
+from sc_jxt_parser import Element, clean_text, extract_body_images, parse_html
 
 
 DATE_RE = re.compile(r"\d{4}-\d{2}-\d{2}")
@@ -228,6 +228,7 @@ def parse_detail(html: str, page_url: str) -> dict:
         "signature_date": signature_dates[-1] if signature_dates else None,
         "body": body,
         "attachments": attachments,
+        "images": extract_body_images(body_node, page_url),
         "application_links": URL_RE.findall(body),
         "parser_template": parser_template,
     }

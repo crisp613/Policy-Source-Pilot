@@ -20,11 +20,13 @@ def list_page_url(page: int) -> str:
 CONFIG = SourceConfig(
     "most-service", SOURCE_ID, "国家科技管理信息系统公共服务平台", "国家", "科技", "通知公告",
     list_page_url, parse_list, parse_detail, DEFAULT_OUTPUT,
+    official_url="https://service.most.gov.cn/",
+    collection_method="HTTP直接采集（公开 iframe）",
 )
 
 
-def crawl(*, pages: int = 10, output_dir: Path = DEFAULT_OUTPUT, fetch_text: Callable[[str], str] | None = None, delay_seconds: float = 0.2, timeout_seconds: float = 30.0, resume: bool = True) -> dict:
-    return crawl_source(CONFIG, pages=pages, output_dir=output_dir, fetch_text=fetch_text, delay_seconds=delay_seconds, timeout_seconds=timeout_seconds, resume=resume)
+def crawl(*, pages: int = 10, output_dir: Path = DEFAULT_OUTPUT, fetch_text: Callable[[str], str] | None = None, delay_seconds: float = 0.2, timeout_seconds: float = 30.0, resume: bool = True, image_ocr: bool = False) -> dict:
+    return crawl_source(CONFIG, pages=pages, output_dir=output_dir, fetch_text=fetch_text, delay_seconds=delay_seconds, timeout_seconds=timeout_seconds, resume=resume, image_ocr=image_ocr)
 
 
 if __name__ == "__main__":

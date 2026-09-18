@@ -3,6 +3,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from urllib.error import URLError
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -45,6 +46,7 @@ class ScJxtCrawlerTests(unittest.TestCase):
                 delay_seconds=0,
             )
             details = json.loads((output / "details.json").read_text(encoding="utf-8"))
+            source_status = json.loads((output / "source-status.json").read_text(encoding="utf-8"))
 
             self.assertEqual(2, summary["details_ok"])
             self.assertEqual(0, summary["details_failed"])
@@ -62,6 +64,30 @@ class ScJxtCrawlerTests(unittest.TestCase):
             self.assertEqual("2026-09-15T00:00:00+08:00", details[0]["published_at"])
             self.assertEqual(0, summary["attachments_downloaded"])
             self.assertTrue((output / "lists" / "page-001.html").exists())
+            self.assertEqual("normal", source_status["status"])
+            self.assertEqual(2, source_status["records_collected"])
+            self.assertEqual(0, source_status["consecutive_failures"])
+
+    def test_list_failure_writes_failed_source_status(self):
+        def failed_fetch(_url: str) -> str:
+            raise URLError("offline")
+
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            with self.assertRaises(URLError):
+                crawl(
+                    pages=1,
+                    output_dir=output,
+                    fetch_text=failed_fetch,
+                    delay_seconds=0,
+                    resume=False,
+                )
+
+            source_status = json.loads((output / "source-status.json").read_text(encoding="utf-8"))
+            self.assertEqual("failed", source_status["status"])
+            self.assertEqual(1, source_status["consecutive_failures"])
+            self.assertIn("offline", source_status["last_error"])
+            self.assertIsNone(source_status["last_success_at"])
 
 
 if __name__ == "__main__":

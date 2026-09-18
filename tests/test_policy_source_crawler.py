@@ -60,6 +60,7 @@ class PolicySourceCrawlerSchemaTests(unittest.TestCase):
         self.assertIsNone(record["published_at"])
         self.assertIsNone(record["metadata"]["issuer"])
         self.assertIsNone(record["metadata"]["document_number"])
+        self.assertEqual("not_provided", record["metadata"]["document_number_status"])
         self.assertIsNone(record["metadata"]["publisher"])
         self.assertEqual("not_provided", record["metadata"]["publisher_status"])
         self.assertEqual([], record["metadata"]["attachments"])

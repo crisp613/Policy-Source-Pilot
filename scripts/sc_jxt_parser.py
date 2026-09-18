@@ -105,6 +105,22 @@ def parse_html(html: str) -> Element:
     return parser.root
 
 
+def extract_body_images(body_node: Element, page_url: str) -> list[dict]:
+    """发现正文内嵌图片；不下载图片，供采集器按需临时 OCR。"""
+    images: list[dict] = []
+    seen_urls: set[str] = set()
+    for image in body_node.find_all(tag="img"):
+        source = image.attrs.get("src") or image.attrs.get("data-src") or image.attrs.get("data-original")
+        if not source:
+            continue
+        url = urljoin(page_url, source)
+        if url in seen_urls:
+            continue
+        seen_urls.add(url)
+        images.append({"url": url, "alt": clean_text(image.attrs.get("alt", "")) or None})
+    return images
+
+
 def parse_list(html: str, base_url: str, limit: int | None = None) -> list[dict]:
     root = parse_html(html)
     container = root.find_one(tag="ul", class_name="list-li")
@@ -182,6 +198,7 @@ def parse_detail(html: str, page_url: str) -> dict:
         "signature_date": signature_date,
         "body": body,
         "attachments": attachments,
+        "images": extract_body_images(body_node, page_url),
         "application_links": URL_RE.findall(body),
     }
 

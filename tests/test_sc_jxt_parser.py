@@ -15,6 +15,17 @@ LIST_URL = "https://jxt.sc.gov.cn/scjxt/wjfb/common_list.shtml"
 
 
 class ScJxtParserTests(unittest.TestCase):
+    def test_detail_discovers_inline_body_images_without_downloading(self):
+        html = """
+        <h1 id="zoomtitl">图片通知</h1><div class="date">2026-09-18</div>
+        <div id="zoomcon"><p>请查看图片中的申报要求。</p><img src="images/notice.png" alt="申报要求图"></div>
+        """
+        result = parse_detail(html, "https://example.test/news/detail.shtml")
+        self.assertEqual(
+            [{"url": "https://example.test/news/images/notice.png", "alt": "申报要求图"}],
+            result["images"],
+        )
+
     def fixture(self, name: str) -> str:
         return (FIXTURES / name).read_text(encoding="utf-8")
 

@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 from urllib.parse import urljoin
 
-from sc_jxt_parser import Element, parse_html
+from sc_jxt_parser import Element, extract_body_images, parse_html
 from sc_kjt_parser import compact_text
 
 
@@ -122,6 +122,7 @@ def parse_detail(html: str, page_url: str) -> dict:
         "signature_date": signature_date,
         "body": body,
         "attachments": extract_attachments(body_node),
+        "images": extract_body_images(body_node, page_url),
         "application_links": URL_RE.findall(body),
         "guideline_login_required": "请登录系统" in body and "申报指南" in body,
     }
