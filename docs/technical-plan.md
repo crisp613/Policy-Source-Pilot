@@ -12,6 +12,14 @@
 
 本阶段只完成访问验证、样本解析和连接器设计，不写生产数据库、不启用定时采集、不接入前端和推送链路。
 
+### 实施状态（2026-09-18）
+
+- 已完成三个来源的首轮低频验证、来源卡、结构化样本、最小 HTML 夹具和解析测试。
+- 已实现统一采集引擎 `scripts/policy_source_crawler.py` 和统一命令入口 `scripts/crawl_policy_source.py`。
+- 已额外采集三个来源前 10 页，共 30 个列表页、400 条去重详情，纯文本正文解析成功 400 条、失败 0 条。
+- 四川省科技厅已支持普通通知、政策文件两套已知模板，并提供通用正文规则兜底。
+- 批量采集使用 0.2 秒间隔，属于后续功能覆盖验证，不替代本方案规定的 60 秒低频验证和第二次真实运行。
+
 > 省科技厅在任务截图中写作 `newchild.shtml`，任务书中为 `newschild.shtml`。实施时应将两者作为入口校验项，以实际返回有效列表的官方地址为准，并在来源卡中记录差异。
 
 ## 2. 当前阶段定位
@@ -58,7 +66,17 @@ RawFeedItem 兼容结构 + metadata + 字段证据
 固定夹具单元测试和第二次真实运行
 ```
 
-验证代码采用“通用探针 + 每站解析配置”。网络请求、解析和证据落盘分离；站点解析尽量写成纯函数，以便最终方案确定后选择性迁移。
+验证代码采用“通用采集引擎 + 每站分页配置 + 每站解析器”。网络请求、解析和证据落盘分离；站点解析保持纯函数，以便最终方案确定后选择性迁移。
+
+```text
+crawl_policy_source.py
+        ↓ 选择来源
+policy_source_crawler.py
+        ↓ 调用来源配置
+分页 URL + 列表解析器 + 详情解析器
+        ↓
+lists.json + details.json + 原始 HTML + summary.json
+```
 
 ## 4. 来源采集策略
 
@@ -138,17 +156,21 @@ RawFeedItem 兼容结构 + metadata + 字段证据
 ## 8. 本地目录设计
 
 ```text
-policy-source-pilot/
+Policy-Source-Pilot/
 ├── README.md
 ├── docs/
 │   ├── technical-plan.md
 │   └── source-cards/
 ├── samples/
 ├── scripts/
-│   └── probe_policy_sources.py
+│   ├── policy_source_crawler.py
+│   ├── crawl_policy_source.py
+│   ├── crawl_sc_jxt.py
+│   ├── crawl_sc_kjt.py
+│   └── crawl_most_service.py
 ├── tests/
 │   ├── fixtures/policy-sources/
-│   └── test_policy_source_probe.py
+│   └── test_*.py
 ├── run-records/
 ├── evidence/
 └── local-artifacts/       # 原始响应，不提交 Git
@@ -157,18 +179,19 @@ policy-source-pilot/
 探针通过命令行显式运行，不接入正式处理器：
 
 ```bash
-python scripts/probe_policy_sources.py \
-  --source sc-jxt-notices \
-  --mode live \
-  --limit 10 \
-  --detail-limit 3
+python scripts/crawl_policy_source.py \
+  --source sc-jxt \
+  --pages 1 \
+  --delay 60
 ```
 
 固定夹具测试不得访问互联网：
 
 ```bash
-pytest tests/test_policy_source_probe.py
+python3 -m unittest discover -s tests -v
 ```
+
+统一命令也支持 `sc-kjt` 和 `most-service`。三个旧的独立采集命令作为兼容入口保留。
 
 ## 9. 测试范围
 
@@ -184,6 +207,8 @@ pytest tests/test_policy_source_probe.py
 8. 相同 URL 内容变化时识别更新；
 9. HTML 结构变化时记录解析失败；
 10. 登录或限制页面不被当成正文。
+
+截至 2026-09-18 已有 17 项离线测试通过。现有测试覆盖上述主要解析路径，但“主发布日期缺失保持 `null`”仍需增加独立用例；第二次真实运行的增量、更新和失效分类也尚未对三个来源全部完成。
 
 ## 10. 交付与迁移
 

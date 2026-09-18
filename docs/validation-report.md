@@ -2,13 +2,14 @@
 
 ## 本轮范围
 
-- 工作目录：`/Users/crisp/Developer/policy-source-pilot`
+- 工作目录：`C:\developer\Policy-Source-Pilot`
 - 当前分支：`research/policy-source-pilot`
 - 基础提交：`4d88f51d421826d608316563f8598308005075a1`（`chore: initialize policy source pilot`）
-- 远程仓库：未配置
-- 验证日期：2026-09-16
+- 远程仓库：`https://github.com/crisp613/Policy-Source-Pilot.git`
+- 首轮验证日期：2026-09-16
+- 后续批量采集日期：2026-09-18
 - 验证来源：四川省经济和信息化厅、四川省科学技术厅、国家科技管理信息系统公共服务平台
-- 当前状态：所有产物保留在本地工作树，尚未提交
+- 采集器基线提交：`a12ea69`（`feat: add unified policy source crawlers`），已推送至远程验证分支
 
 本轮只验证公开列表、公开详情和公开附件信息。没有修改生产数据库，没有注册正式采集器，没有启动定时任务，没有接入搜索、阅读端或推送链路，也没有访问登录后的申报系统和指南正文。
 
@@ -21,6 +22,21 @@
 | 国家科技管理信息系统 | 外层页HTTP 200；公开iframe HTTP 200；当前页10条、共447条 | 3条详情HTTP 200 | 标题、日期、来源、正文和公开时间3/3；附件只公开名称 | HTTP直采公开iframe，初期每日1次 | 可进入正式连接器设计候选 | 指南正文需要登录，只能保留公开信息和官方入口 |
 
 三个来源的 `/robots.txt` 均返回404。该结果只表示没有取得公开 robots 规则，不解释为明确允许或禁止。
+
+## 2026-09-18 后续批量采集
+
+在首轮小样本验证基础上，使用统一采集引擎对三个来源分别采集前 10 页纯文本详情：
+
+| 来源 | 列表页 | 去重详情 | 解析成功 | 解析失败 | 结果目录 |
+| --- | ---: | ---: | ---: | ---: | --- |
+| 四川省经济和信息化厅 | 10 | 150 | 150 | 0 | `local-artifacts/sc-jxt-notices/first-10-pages/` |
+| 四川省科学技术厅 | 10 | 150 | 150 | 0 | `local-artifacts/sc-kjt-notices/first-10-pages/` |
+| 国家科技管理信息系统 | 10 | 100 | 100 | 0 | `local-artifacts/most-service-notices/first-10-pages/` |
+| **合计** | **30** | **400** | **400** | **0** |  |
+
+四川省科技厅首次批量解析时有 8 条详情因跳转到行政规范性文件或其他文件模板而失败。增加 `.articlebox/.contText` 政策文件模板和通用正文兜底后，利用已保存的 HTML 重新解析，最终 150/150 成功。
+
+本次批量采集按后续开发要求使用单线程、0.2 秒间隔，不下载附件、不处理图片、不进入登录系统。该运行用于验证采集框架和页面模板覆盖，不作为任务书所要求的 60 秒低频第二次运行证据。
 
 ## 来源一：四川省经济和信息化厅
 
@@ -177,9 +193,12 @@
 - 解析器：`scripts/sc_jxt_parser.py`
 - 解析器：`scripts/sc_kjt_parser.py`
 - 解析器：`scripts/most_service_parser.py`
+- 通用采集引擎：`scripts/policy_source_crawler.py`
+- 统一命令入口：`scripts/crawl_policy_source.py`
+- 来源兼容入口：`scripts/crawl_sc_jxt.py`、`scripts/crawl_sc_kjt.py`、`scripts/crawl_most_service.py`
 - 运行对比器：`scripts/compare_sc_jxt_runs.py`
-- 最小HTML夹具：9个
-- 测试文件：3个
+- 最小HTML夹具：11个
+- 测试文件：4个
 
 ### 执行命令与结果
 
@@ -187,7 +206,7 @@
 python3 -m unittest discover -s tests -v
 ```
 
-实际结果：13个测试全部通过。
+实际结果：17个测试全部通过。
 
 测试覆盖：
 
@@ -200,6 +219,9 @@ python3 -m unittest discover -s tests -v
 - 登录后指南停止条件
 - 新增、重复、更新和当前样本缺失的比较分类
 - HTML核心结构缺失时明确抛出解析错误
+- 四川省科技厅政策文件模板解析
+- 未知详情模板的通用正文规则兜底
+- 统一采集引擎的本地保存和断点续传基础行为
 
 三个解析器均使用保存的真实响应做过本地回归：三个列表各解析10条，九条详情的核心字段与人工核对结果一致。
 
@@ -209,6 +231,7 @@ python3 -m unittest discover -s tests -v
 - 四川省经信厅第二次运行：前期出现TLS或DNS错误；网络恢复后列表前10条全部重复且未变化，详情样本1的解析结果、HTML和哈希均未变化。其余2条详情按轻量验证范围未复测。
 - 四川省科技厅第一次运行：robots、列表和3条详情完成。
 - 国家科技管理信息系统第一次运行：robots、外层列表、公开iframe和3条详情完成。
+- 2026-09-18 批量采集：三个来源各前10页，共400条详情纯文本解析成功；详细汇总见 `run-records/first-10-pages-batch-01.md`。
 - 所有公开详情请求均未携带登录凭证、Cookie或个人信息。
 
 完整请求时间和结果见 `run-records/`。原始完整响应保存在被Git忽略的 `local-artifacts/`，报告只引用结构化样本和响应哈希。
@@ -219,6 +242,8 @@ python3 -m unittest discover -s tests -v
   - 四川省经信厅已复测列表和1条详情；另外2条详情未复测。
   - 四川省科技厅和国家科技管理信息系统尚未进行第二次运行。
 - 因此当前不能声称三个来源长期稳定，也没有完成基于两次成功快照的新增、重复、更新和失效统计。
+- 0.2秒间隔的批量采集不满足任务书规定的60秒低频要求，不能作为第二次合规真实运行替代品。
+- 当前批量输出仍为验证结构，尚未完全转换为正式管道要求的 `external_id/title/url/published_at/content/metadata` 契约。
 - 国家科技管理信息系统的指南正文位于登录后，本轮没有验证其内容。
 - 四川省科技厅截图中的 `newchild.shtml` 未请求；有效的 `newschild.shtml` 已满足当前栏目验证需要。
 
