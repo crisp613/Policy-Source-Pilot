@@ -48,8 +48,18 @@ class ScJxtCrawlerTests(unittest.TestCase):
 
             self.assertEqual(2, summary["details_ok"])
             self.assertEqual(0, summary["details_failed"])
-            self.assertIn("申报", details[0]["body"])
-            self.assertNotIn("附件：项目申报书", details[0]["body"])
+            self.assertEqual(
+                {"external_id", "title", "url", "published_at", "content", "metadata"},
+                set(details[0]),
+            )
+            self.assertIn("申报", details[0]["content"])
+            self.assertNotIn("附件：项目申报书", details[0]["content"])
+            self.assertEqual("sc-jxt-notices", details[0]["metadata"]["source_id"])
+            self.assertEqual("四川省", details[0]["metadata"]["source_level"])
+            self.assertEqual("经信", details[0]["metadata"]["department_line"])
+            self.assertEqual("文件发布", details[0]["metadata"]["column_name"])
+            self.assertEqual("ok", details[0]["metadata"]["status"])
+            self.assertEqual("2026-09-15T00:00:00+08:00", details[0]["published_at"])
             self.assertEqual(0, summary["attachments_downloaded"])
             self.assertTrue((output / "lists" / "page-001.html").exists())
 

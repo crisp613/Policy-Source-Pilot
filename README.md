@@ -69,11 +69,40 @@ local-artifacts/<source-id>/first-10-pages/
 ├── lists/             # 原始列表 HTML
 ├── details-html/      # 原始详情 HTML，以 URL 的 SHA-256 命名
 ├── lists.json         # 去重后的列表记录
-├── details.json       # 标题、日期、主体、正文和公开链接
+├── details.json       # 统一 RawFeedItem 兼容结构的详情记录
 └── summary.json       # 成功、失败和运行参数汇总
 ```
 
 脚本默认复用已经保存的 HTML 和成功详情。使用 `--no-resume` 才会忽略本地缓存重新请求。
+
+三个来源的 `details.json` 使用相同的顶层字段：
+
+```json
+{
+  "external_id": "来源 ID 与原文 URL 生成的稳定标识",
+  "title": "官方原标题",
+  "url": "官方详情页地址",
+  "published_at": "带 +08:00 时区的 ISO 8601 时间",
+  "content": "纯文本正文",
+  "metadata": {
+    "source_id": "来源 ID",
+    "source_name": "来源名称",
+    "source_level": "国家或四川省",
+    "department_line": "科技或经信",
+    "column_name": "公开栏目名称",
+    "issuer": null,
+    "publishing_unit": null,
+    "info_source": null,
+    "document_number": null,
+    "attachments": [],
+    "application_links": [],
+    "collected_at": "采集时间",
+    "status": "ok"
+  }
+}
+```
+
+来源未明确提供的单值字段写为 `null`，列表字段写为空数组，不使用推断值补齐。`lists.json` 也统一包含来源、标题、详情地址、发布日期及证据、采集时间、页码和发布单位字段。已有旧版 `details.json` 在断点续传时会自动转换为新结构，不需要重新请求网页。
 
 ## 本地测试
 
@@ -83,11 +112,11 @@ local-artifacts/<source-id>/first-10-pages/
 python3 -m unittest discover -s tests -v
 ```
 
-当前结果为 17 项测试全部通过，覆盖列表解析、相对链接、正文清洗、空字段、附件、登录边界、科技厅政策文件模板和未知模板兜底。
+当前结果为 19 项测试全部通过，覆盖统一输出结构、列表解析、相对链接、正文清洗、空字段、附件、登录边界、科技厅政策文件模板和未知模板兜底。
 
 ## 已知边界
 
-- 当前批量输出仍是验证结构，尚未完全转换为正式 `RawFeedItem` 契约。
+- 当前批量输出已转换为 `RawFeedItem` 兼容结构，但仍未注册为正式连接器。
 - 当前不下载附件文件，不执行图片 OCR。
 - 国家科技管理信息系统登录后的申报指南不在采集范围内。
 - 三个来源尚未全部完成任务书要求的第二次低频真实运行与增量对比。

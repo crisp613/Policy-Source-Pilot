@@ -17,7 +17,10 @@ def list_page_url(page: int) -> str:
     return LIST_URL if page == 1 else f"https://service.most.gov.cn/kjjh_tztg/index_{page}.html"
 
 
-CONFIG = SourceConfig("most-service", SOURCE_ID, "国家科技管理信息系统公共服务平台", list_page_url, parse_list, parse_detail, DEFAULT_OUTPUT)
+CONFIG = SourceConfig(
+    "most-service", SOURCE_ID, "国家科技管理信息系统公共服务平台", "国家", "科技", "通知公告",
+    list_page_url, parse_list, parse_detail, DEFAULT_OUTPUT,
+)
 
 
 def crawl(*, pages: int = 10, output_dir: Path = DEFAULT_OUTPUT, fetch_text: Callable[[str], str] | None = None, delay_seconds: float = 0.2, timeout_seconds: float = 30.0, resume: bool = True) -> dict:

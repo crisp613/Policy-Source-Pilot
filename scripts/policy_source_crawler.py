@@ -7,6 +7,7 @@ import hashlib
 import json
 import time
 from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Callable
 from urllib.error import HTTPError, URLError
@@ -18,6 +19,7 @@ DetailParser = Callable[[str, str], dict]
 PageUrlBuilder = Callable[[int], str]
 TextFetcher = Callable[[str], str]
 USER_AGENT = "PolicySourcePilot/0.2 (public-source-collection)"
+LOCAL_TIMEZONE = timezone(timedelta(hours=8))
 
 
 @dataclass(frozen=True)
@@ -25,10 +27,121 @@ class SourceConfig:
     key: str
     source_id: str
     name: str
+    source_level: str
+    department_line: str
+    column_name: str
     list_page_url: PageUrlBuilder
     parse_list: ListParser
     parse_detail: DetailParser
     default_output: Path
+
+
+def current_time() -> str:
+    return datetime.now(LOCAL_TIMEZONE).isoformat(timespec="seconds")
+
+
+def normalize_datetime(value: str | None) -> str | None:
+    """将源站常见日期格式统一成带东八区时区的 ISO 8601。"""
+    if not value:
+        return None
+    raw_value = value.strip()
+    normalized = raw_value.replace(" ", "T")
+    try:
+        parsed = datetime.fromisoformat(normalized)
+    except ValueError:
+        parsed = None
+        for date_format in ("%Y年%m月%d日", "%Y年%m月%d日%H时%M分"):
+            try:
+                parsed = datetime.strptime(raw_value, date_format)
+                break
+            except ValueError:
+                continue
+        if parsed is None:
+            return value
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=LOCAL_TIMEZONE)
+    return parsed.isoformat(timespec="seconds")
+
+
+def external_id(source_id: str, url: str) -> str:
+    digest = hashlib.sha256(url.encode("utf-8")).hexdigest()
+    return f"{source_id}:{digest}"
+
+
+def normalize_list_record(
+    config: SourceConfig,
+    item: dict,
+    *,
+    list_page: int,
+    collected_at: str,
+) -> dict:
+    """统一三个来源的列表输出；未知值保持为空。"""
+    return {
+        "source_id": config.source_id,
+        "title": item.get("title"),
+        "detail_url": item.get("detail_url"),
+        "published_at": normalize_datetime(item.get("published_at")),
+        "published_at_evidence": "列表页可见日期文本",
+        "collected_at": collected_at,
+        "list_page": list_page,
+        "publishing_unit": item.get("publishing_unit"),
+    }
+
+
+def normalize_detail_record(
+    config: SourceConfig,
+    *,
+    detail_url: str,
+    list_item: dict,
+    parsed: dict | None = None,
+    status: str = "ok",
+    collected_at: str | None = None,
+    http_status: int | None = None,
+    error: str | None = None,
+) -> dict:
+    """转换为任务书规定的 RawFeedItem 兼容结构。"""
+    parsed = parsed or {}
+    published_at = parsed.get("published_at") or list_item.get("published_at")
+    return {
+        "external_id": external_id(config.source_id, detail_url),
+        "title": parsed.get("title") or list_item.get("title"),
+        "url": detail_url,
+        "published_at": normalize_datetime(published_at),
+        "content": parsed.get("body"),
+        "metadata": {
+            "source_id": config.source_id,
+            "source_name": config.name,
+            "source_level": config.source_level,
+            "department_line": config.department_line,
+            "column_name": config.column_name,
+            "issuer": parsed.get("issuer"),
+            "publishing_unit": parsed.get("publishing_unit") or list_item.get("publishing_unit"),
+            "info_source": parsed.get("info_source"),
+            "document_number": parsed.get("document_number"),
+            "signature_date": normalize_datetime(parsed.get("signature_date")),
+            "metadata_published_at": normalize_datetime(parsed.get("metadata_published_at")),
+            "attachments": parsed.get("attachments") or [],
+            "application_links": parsed.get("application_links") or [],
+            "guideline_login_required": bool(parsed.get("guideline_login_required", False)),
+            "parser_template": parsed.get("parser_template"),
+            "list_page": list_item.get("list_page"),
+            "list_published_at": normalize_datetime(list_item.get("published_at")),
+            "published_at_evidence": "详情页可见日期文本" if parsed.get("published_at") else "列表页可见日期文本",
+            "collected_at": collected_at,
+            "status": status,
+            "http_status": http_status,
+            "error": error,
+        },
+    }
+
+
+def record_url(record: dict) -> str | None:
+    return record.get("url") or record.get("detail_url")
+
+
+def record_status(record: dict) -> str | None:
+    metadata = record.get("metadata")
+    return metadata.get("status") if isinstance(metadata, dict) else record.get("status")
 
 
 def decode_response(payload: bytes, charset: str | None) -> str:
@@ -103,12 +216,15 @@ def crawl_source(
         url = config.list_page_url(page)
         html_path = output_dir / "lists" / f"page-{page:03d}.html"
         html = load_or_fetch(html_path, url, fetch_text, resume)
+        collected_at = current_time()
         for item in config.parse_list(html, url, None):
             detail_url = item["detail_url"]
             if detail_url in seen_urls:
                 continue
             seen_urls.add(detail_url)
-            list_records.append({"source_id": config.source_id, "list_page": page, **item})
+            list_records.append(
+                normalize_list_record(config, item, list_page=page, collected_at=collected_at)
+            )
 
     write_json(output_dir / "lists.json", list_records)
     details_path = output_dir / "details.json"
@@ -122,59 +238,73 @@ def crawl_source(
             previous_details = []
 
     completed = {
-        item.get("detail_url"): item
+        record_url(item): item
         for item in previous_details
-        if item.get("detail_url") and item.get("status") == "ok"
+        if record_url(item) and record_status(item) == "ok"
     }
     details: list[dict] = []
 
     for index, list_item in enumerate(list_records, start=1):
         detail_url = list_item["detail_url"]
         if detail_url in completed:
-            details.append(completed[detail_url])
+            previous = completed[detail_url]
+            if set(previous) == {"external_id", "title", "url", "published_at", "content", "metadata"}:
+                details.append(previous)
+            else:
+                details.append(
+                    normalize_detail_record(
+                        config,
+                        detail_url=detail_url,
+                        list_item=list_item,
+                        parsed=previous,
+                        status="ok",
+                        collected_at=previous.get("collected_at"),
+                    )
+                )
             continue
         html_path = output_dir / "details-html" / detail_file_name(detail_url)
         try:
             html = load_or_fetch(html_path, detail_url, fetch_text, resume)
             parsed = config.parse_detail(html, detail_url)
-            record = {
-                "source_id": config.source_id,
-                "detail_url": detail_url,
-                "list_page": list_item["list_page"],
-                "list_published_at": list_item["published_at"],
-                "status": "ok",
-                **parsed,
-            }
+            record = normalize_detail_record(
+                config,
+                detail_url=detail_url,
+                list_item=list_item,
+                parsed=parsed,
+                status="ok",
+                collected_at=current_time(),
+                http_status=200,
+            )
         except HTTPError as error:
-            record = {
-                "source_id": config.source_id,
-                "detail_url": detail_url,
-                "list_page": list_item["list_page"],
-                "title": list_item["title"],
-                "status": "http_error",
-                "http_status": error.code,
-                "error": str(error),
-            }
+            record = normalize_detail_record(
+                config,
+                detail_url=detail_url,
+                list_item=list_item,
+                status="http_error",
+                collected_at=current_time(),
+                http_status=error.code,
+                error=str(error),
+            )
         except (URLError, TimeoutError, OSError, UnicodeError, ValueError) as error:
-            record = {
-                "source_id": config.source_id,
-                "detail_url": detail_url,
-                "list_page": list_item["list_page"],
-                "title": list_item["title"],
-                "status": "error",
-                "error": str(error),
-            }
+            record = normalize_detail_record(
+                config,
+                detail_url=detail_url,
+                list_item=list_item,
+                status="error",
+                collected_at=current_time(),
+                error=str(error),
+            )
         details.append(record)
         write_json(details_path, details)
-        print(f"[{index}/{len(list_records)}] {record['status']}: {detail_url}", flush=True)
+        print(f"[{index}/{len(list_records)}] {record_status(record)}: {detail_url}", flush=True)
 
     write_json(details_path, details)
     summary = {
         "source_id": config.source_id,
         "requested_pages": pages,
         "list_items": len(list_records),
-        "details_ok": sum(item["status"] == "ok" for item in details),
-        "details_failed": sum(item["status"] != "ok" for item in details),
+        "details_ok": sum(record_status(item) == "ok" for item in details),
+        "details_failed": sum(record_status(item) != "ok" for item in details),
         "delay_seconds": delay_seconds,
         "attachments_downloaded": 0,
         "images_processed": 0,

@@ -17,7 +17,10 @@ def list_page_url(page: int) -> str:
     return LIST_URL if page == 1 else f"https://jxt.sc.gov.cn/scjxt/wjfb/common_list_{page}.shtml"
 
 
-CONFIG = SourceConfig("sc-jxt", SOURCE_ID, "四川省经济和信息化厅", list_page_url, parse_list, parse_detail, DEFAULT_OUTPUT)
+CONFIG = SourceConfig(
+    "sc-jxt", SOURCE_ID, "四川省经济和信息化厅", "四川省", "经信", "文件发布",
+    list_page_url, parse_list, parse_detail, DEFAULT_OUTPUT,
+)
 
 
 def crawl(*, pages: int = 10, output_dir: Path = DEFAULT_OUTPUT, fetch_text: Callable[[str], str] | None = None, delay_seconds: float = 0.2, timeout_seconds: float = 30.0, resume: bool = True) -> dict:
